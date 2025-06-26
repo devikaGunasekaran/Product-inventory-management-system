@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Inventory Management System</h2>
+        
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="myTabs">
+            <li class="nav-item"><a class="nav-link active" href="#categories" data-bs-toggle="tab">Categories</a></li>
+            <li class="nav-item"><a class="nav-link" href="#suppliers" data-bs-toggle="tab">Suppliers</a></li>
+            <li class="nav-item"><a class="nav-link" href="#products" data-bs-toggle="tab">Products</a></li>
+            <li class="nav-item"><a class="nav-link" href="#sales" data-bs-toggle="tab">Sales</a></li>
+        </ul>
+
+        <div class="tab-content mt-3">
+            
+            <!-- Categories Table -->
+            <div class="tab-pane fade show active" id="categories">
+                <h3>Categories</h3>
+                <form action="/add_category" method="post">
+                    <input type="text" name="category_name" placeholder="Category Name" required>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </form>
+                <table class="table table-bordered mt-2">
+                    <thead><tr><th>ID</th><th>Name</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>{{ category.category_id }}</td>
+                            <td>{{ category.category_name }}</td>
+                            <td>
+                                <form action="/update_category/{{ category.category_id }}" method="post" class="d-inline">
+                                    <input type="text" name="category_name" value="{{ category.category_name }}" required>
+                                    <button type="submit" class="btn btn-warning">Update</button>
+                                </form>
+                                <a href="/delete_category/{{ category.category_id }}" class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Suppliers Table -->
+            <div class="tab-pane fade" id="suppliers">
+                <h3>Suppliers</h3>
+                <form action="/add_supplier" method="post">
+                    <input type="text" name="supplier_name" placeholder="Supplier Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="text" name="contact_number" placeholder="Contact" required>
+                    <input type="text" name="address" placeholder="Address" required>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </form>
+                <table class="table table-bordered mt-2">
+                    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Contact</th><th>Address</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        {% for supplier in suppliers %}
+                        <tr>
+                            <td>{{ supplier.supplier_id }}</td>
+                            <td>{{ supplier.supplier_name }}</td>
+                            <td>{{ supplier.email }}</td>
+                            <td>{{ supplier.contact_number }}</td>
+                            <td>{{ supplier.address }}</td>
+                            <td>
+                                <form action="/update_supplier/{{ supplier.supplier_id }}" method="post" class="d-inline">
+                                    <input type="text" name="supplier_name" value="{{ supplier.supplier_name }}" required>
+                                    <input type="email" name="email" value="{{ supplier.email }}" required>
+                                    <input type="text" name="contact_number" value="{{ supplier.contact_number }}" required>
+                                    <input type="text" name="address" value="{{ supplier.address }}" required>
+                                    <button type="submit" class="btn btn-warning">Update</button>
+                                </form>
+                                <a href="/delete_supplier/{{ supplier.supplier_id }}" class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+ <!-- Products Table -->
+ <div class="tab-pane fade" id="products">
+    <h3>Products</h3>
+    <form action="/add_product" method="post">
+        <input type="text" name="product_name" placeholder="Product Name" required>
+        <input type="number" name="price" placeholder="Price" step="0.01" required>
+        <input type="number" name="quantity_in_stock" placeholder="Stock" required>
+    
+        <!-- Select Category by ID -->
+        <select name="category_id" required>
+            {% for category in categories %}
+            <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+            {% endfor %}
+        </select>
+    
+        <!-- Select Supplier by ID -->
+        <select name="supplier_id" required>
+            {% for supplier in suppliers %}
+            <option value="{{ supplier.supplier_id }}">{{ supplier.supplier_name }}</option>
+            {% endfor %}
+        </select>
+    
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+    
+    <table class="table table-bordered mt-2">
+        <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Category</th><th>Supplier</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.product_id }}</td>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.quantity_in_stock }}</td>
+                <td>{{ product.category_name }}</td>
+                <td>{{ product.supplier_name }}</td>
+                <td>
+                    <form action="/update_product/{{ product.product_id }}" method="post" class="d-inline">
+                        <input type="text" name="product_name" value="{{ product.product_name }}" required>
+                        <input type="number" name="price" value="{{ product.price }}" step="0.01" required>
+                        <input type="number" name="quantity_in_stock" value="{{ product.quantity_in_stock }}" required>
+                        <select name="category_name" required>
+                            {% for category in categories %}
+                            <option value="{{ category.category_name }}" {% if category.category_name == product.category_name %}selected{% endif %}>{{ category.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="supplier_name" required>
+                            {% for supplier in suppliers %}
+                            <option value="{{ supplier.supplier_name }}" {% if supplier.supplier_name == product.supplier_name %}selected{% endif %}>{{ supplier.supplier_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-warning">Update</button>
+                    </form>
+                    <a href="/delete_product/{{ product.product_id }}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Sales Table -->
+<div class="tab-pane fade" id="sales">
+    <h3>Sales</h3>
+    <form action="/add_sale" method="post" class="mb-3">
+        <select name="product_id" required>
+            <option value="" disabled selected>Select Product</option>
+            {% for product in products %}
+            <option value="{{ product.product_id }}">{{ product.product_name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="quantity_sold" placeholder="Quantity Sold" required>
+        <input type="date" name="sale_date" required>
+        <input type="number" name="total_amount" placeholder="Total Amount" required>
+        <button type="submit" class="btn btn-primary">Add Sale</button>
+    </form>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr><th>ID</th><th>Product</th><th>Quantity Sold</th><th>Date</th><th>Total Amount</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td>{{ sale.sale_id }}</td>
+                <td>{{ sale.product_name }}</td>
+                <td>{{ sale.quantity_sold }}</td>
+                <td>{{ sale.sale_date }}</td>
+                <td>{{ sale.total_amount }}</td>
+                <td>
+                    <form action="/update_sale/{{ sale.sale_id }}" method="post" class="d-inline">
+                        <select name="product_id" required>
+                            {% for product in products %}
+                            <option value="{{ product.product_id }}" {% if product.product_id == sale.product_id %}selected{% endif %}>
+                                {{ product.product_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" name="quantity_sold" value="{{ sale.quantity_sold }}" required>
+                        <input type="date" name="sale_date" value="{{ sale.sale_date }}" required>
+                        <input type="number" name="total_amount" value="{{ sale.total_amount }}" required>
+                        <button type="submit" class="btn btn-warning">Update</button>
+                    </form>
+                    <a href="/delete_sale/{{ sale.sale_id }}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</html>
